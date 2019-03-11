@@ -478,10 +478,10 @@ class DataGenerator:
                 if not annotations_dir is None:
                     # Parse the XML file for this image.
                     with open(os.path.join(annotations_dir, image_id + '.xml')) as f:
-                        soup = BeautifulSoup(f, 'xml')
-
-                    folder = soup.folder.text # In case we want to return the folder in addition to the image file name. Relevant for determining which dataset an image belongs to.
-                    #filename = soup.filename.text
+                        soup = BeautifulSoup(f, 'lxml')
+                        folder = 'VOC'
+#                     folder = soup.folder.text # In case we want to return the folder in addition to the image file name. Relevant for determining which dataset an image belongs to.
+#                     filename = soup.filename.text
 
                     boxes = [] # We'll store all boxes for this image here.
                     eval_neutr = [] # We'll store whether a box is annotated as "difficult" here.
@@ -493,25 +493,25 @@ class DataGenerator:
                         class_id = self.classes.index(class_name)
                         # Check whether this class is supposed to be included in the dataset.
                         if (not self.include_classes == 'all') and (not class_id in self.include_classes): continue
-                        pose = obj.find('pose', recursive=False).text
-                        truncated = int(obj.find('truncated', recursive=False).text)
-                        if exclude_truncated and (truncated == 1): continue
-                        difficult = int(obj.find('difficult', recursive=False).text)
-                        if exclude_difficult and (difficult == 1): continue
+                        # pose = obj.find('pose', recursive=False).text
+                        # truncated = int(obj.find('truncated', recursive=False).text)
+                        # if exclude_truncated and (truncated == 1): continue
+                        # difficult = int(obj.find('difficult', recursive=False).text)
+                        # if exclude_difficult and (difficult == 1): continue
                         # Get the bounding box coordinates.
                         bndbox = obj.find('bndbox', recursive=False)
-                        xmin = int(bndbox.xmin.text)
-                        ymin = int(bndbox.ymin.text)
-                        xmax = int(bndbox.xmax.text)
-                        ymax = int(bndbox.ymax.text)
+                        xmin = int(float(bndbox.xmin.text))
+                        ymin = int(float(bndbox.ymin.text))
+                        xmax = int(float(bndbox.xmax.text))
+                        ymax = int(float(bndbox.ymax.text))
                         item_dict = {'folder': folder,
                                      'image_name': filename,
                                      'image_id': image_id,
                                      'class_name': class_name,
                                      'class_id': class_id,
-                                     'pose': pose,
-                                     'truncated': truncated,
-                                     'difficult': difficult,
+                                     # 'pose': pose,
+                                     # 'truncated': truncated,
+                                     # 'difficult': difficult,
                                      'xmin': xmin,
                                      'ymin': ymin,
                                      'xmax': xmax,
@@ -520,8 +520,9 @@ class DataGenerator:
                         for item in self.labels_output_format:
                             box.append(item_dict[item])
                         boxes.append(box)
-                        if difficult: eval_neutr.append(True)
-                        else: eval_neutr.append(False)
+                        # if difficult: eval_neutr.append(True)
+                        # else:
+                        eval_neutr.append(False)
 
                     self.labels.append(boxes)
                     self.eval_neutral.append(eval_neutr)
