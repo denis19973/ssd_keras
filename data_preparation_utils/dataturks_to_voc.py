@@ -149,7 +149,7 @@ def convert_to_PascalVOC(dataturks_labeled_item, image_dir, xml_out_dir):
 
         # output to a file.
         xmlFilePath = os.path.join(xml_out_dir, fileName + ".xml")
-        with open(xmlFilePath, 'w') as f:
+        with open(xmlFilePath, 'w', encoding='utf-8') as f:
             f.write(xml)
         return True
     except Exception as e:
@@ -173,7 +173,7 @@ def main():
         return
 
     lines = []
-    with open(dataturks_JSON_FilePath, 'r') as f:
+    with open(dataturks_JSON_FilePath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
     if (not lines or len(lines) == 0):
